@@ -165,6 +165,8 @@ archives/
 dblp.mtx
 ork.mtx
 you.mtx
+you.gml
+you.txt
 
 #### TEST FILES ####
 test_*.ipynb
@@ -186,4 +188,3 @@ src/models/vote/
 
 test/
 old_tests/
-dataset/
