@@ -185,5 +185,3 @@ src/utils/manually/plot_from_json.py
 src/models/nets/
 src/models/pow/
 src/models/vote/
-
-old_tests/
