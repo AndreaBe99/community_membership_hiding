@@ -1,0 +1,13 @@
+numpy
+pandas
+scipy 
+networkx 
+matplotlib 
+seaborn 
+scikit-learn
+torch 
+torchvision 
+torchaudio
+igraph
+cdlib[C]
+karateclub
