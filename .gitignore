@@ -186,5 +186,4 @@ src/models/nets/
 src/models/pow/
 src/models/vote/
 
-test/
 old_tests/
