@@ -58,6 +58,27 @@ def plot_singleDataset_singleTaus_allBetas(
                         dict_metrics[metric][beta][agent_renamed] = data[alg][metric]
                     else:
                         dict_metrics[metric][beta][alg] = data[alg][metric]
+
+                    if log_name != "evaluation_node_hiding" and alg == "Agent":
+                        # Agent renamed has 300 values, the others 3, so we need to
+                        # compute the mean of the first 100 values, the second 100 values,
+                        # and the third 100 values
+                        # Get the first 100 values, and compute the mean
+                        first_100 = dict_metrics[metric][beta][agent_renamed][:100]
+                        first_100_mean = mean(first_100)
+                        # Get the second 100 values, and compute the mean
+                        second_100 = dict_metrics[metric][beta][agent_renamed][100:200]
+                        second_100_mean = mean(second_100)
+                        # Get the third 100 values, and compute the mean
+                        third_100 = dict_metrics[metric][beta][agent_renamed][200:]
+                        third_100_mean = mean(third_100)
+
+                        # Replace the values with the mean
+                        dict_metrics[metric][beta][agent_renamed] = [
+                            first_100_mean,
+                            second_100_mean,
+                            third_100_mean,
+                        ]
     # Replace in the algs list the "Agent" with "DRL-Agent (ours)"
     algs = [agent_renamed if alg == "Agent" else alg for alg in algs]
 
@@ -136,10 +157,10 @@ def plot_singleDataset_singleTaus_allBetas(
         g.set_axis_labels("β Values", f"Mean {metric.capitalize()}")
 
         # Rename the x axis label values to "Nμ" where N is the previous name.
-        if log_name == "evaluation_node_hiding":
-            g.set_xticklabels(
-                [f"{float(t.get_text())}μ" for t in g.ax.get_xticklabels()]
-            )
+        # if log_name == "evaluation_node_hiding":
+        #     g.set_xticklabels(
+        #         [f"{float(t.get_text())}μ" for t in g.ax.get_xticklabels()]
+        #     )
 
         # if the metric is goal set the y axis to percentages
         if metric == "goal":
@@ -476,31 +497,33 @@ def confidence_binary_test(x: List[int]):
 
 if __name__ == "__main__":
     ################ SINGLE DATASET - SINGLE TAU - ALL BETAS #################
-    TAU = "0.8"
-    DATASET = "vote"
+    TAU = "0.3"
+    DATASET = "pow"
     ALG = "walktrap"
     # NODE HIDING
-    PATH = f"old_tests/{DATASET}/{ALG}/node_hiding/" + f"tau_{TAU}"
-    plot_singleDataset_singleTaus_allBetas(
-        file_path=PATH,
-        log_name="evaluation_node_hiding",
-        algs=["Agent", "Random", "Degree", "Roam"],
-        metrics=["goal", "nmi", "steps", "time"],
-        betas=[0.5, 1, 2],
-    )
-
-    join_images(PATH, task="node_hiding", nd_box_start_r=1.58)
-
-    # COMMUNITY HIDING
-    # PATH = f"test/{DATASET}/{ALG}/community_hiding/" + f"tau_{TAU}"
+    PATH = f"test/{DATASET}/{ALG}/node_hiding/" + f"tau_{TAU}"
     # plot_singleDataset_singleTaus_allBetas(
     #     file_path=PATH,
-    #     log_name="evaluation_community_hiding",
-    #     algs=["Agent", "Safeness", "Modularity"],
-    #     metrics=["goal", "nmi", "deception_score", "steps", "time"],
-    #     betas=[1, 3, 5],
+    #     log_name="evaluation_node_hiding",
+    #     algs=["Agent", "Random", "Degree", "Roam"],
+    #     metrics=["goal", "nmi", "steps", "time"],
+    #     # betas=[0.5, 1, 2],
+    #     betas=[1, 3, 5, 10],
     # )
-    # join_images(PATH, task="community_hiding", cd_box_start_r=1.63)
+
+    # join_images(PATH, task="node_hiding", nd_box_start_r=1.58)
+
+    # COMMUNITY HIDING
+    PATH = f"test/{DATASET}/{ALG}/community_hiding/" + f"tau_{TAU}"
+    plot_singleDataset_singleTaus_allBetas(
+        file_path=PATH,
+        log_name="evaluation_community_hiding",
+        algs=["Agent", "Safeness", "Modularity"],
+        metrics=["goal", "nmi", "deception_score", "steps", "time"],
+        # betas=[1, 3, 5],
+        betas=[1, 3, 5, 10],
+    )
+    join_images(PATH, task="community_hiding", cd_box_start_r=1.63)
 
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
     # DETECTION_ALG = "louvain"
