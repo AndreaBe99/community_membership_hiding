@@ -51,14 +51,14 @@ if __name__ == "__main__":
         model_path = FilePaths.TRAINED_MODEL.value
 
         # Tau defines the strength of the constraint on the goal achievement
-        taus = [0.3, 0.5, 0.8]
+        taus = [0.3] #, 0.5, 0.8]
         # BETAs defines the number of actions to perform
         # Beta for the community hiding task defines the percentage of rewiring
         # action, add or remove edges
         community_betas = [1, 3, 5, 10]
         # Beta for the node hiding task is a multiplier of mean degree of the
         # the graph
-        node_betas = [3, 5, 10, 15, 20]  # [1, 3, 5, 10]
+        node_betas = [3, 15] #  [3, 5, 10, 15, 20]  # [1, 3, 5, 10]
 
         # Initialize the test class
         node_hiding = NodeHiding(agent=agent, model_path=model_path)
