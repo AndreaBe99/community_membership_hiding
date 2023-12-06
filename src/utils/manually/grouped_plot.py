@@ -89,10 +89,18 @@ def plot_singleDataset_singleTaus_allBetas(
         for beta in betas:
             mean_std[metric][beta] = {}
             for alg in algs:
-                mean_std[metric][beta][alg] = {
-                    "mean": mean(dict_metrics[metric][beta][alg]),
-                    "std": np.std(dict_metrics[metric][beta][alg]),
-                }
+                if metric == "goal":
+                    # instead of computing the standard deviation, compute the
+                    # confidence interval of the mean
+                    mean_std[metric][beta][alg] = {
+                        "mean": mean(dict_metrics[metric][beta][alg]),
+                        "ci": confidence_binary_test(dict_metrics[metric][beta][alg]),
+                    }
+                else:
+                    mean_std[metric][beta][alg] = {
+                        "mean": mean(dict_metrics[metric][beta][alg]),
+                        "std": np.std(dict_metrics[metric][beta][alg]),
+                    }
 
         # Plot the data
         sns.set_theme(style="darkgrid")
@@ -107,6 +115,8 @@ def plot_singleDataset_singleTaus_allBetas(
         # if the metric is goal don't plot the error bars
         if metric == "nmi" or metric == "deception_score":
             errorbar = "sd"
+        elif metric == "goal":
+            errorbar = "ci"
         else:
             errorbar = None
 
@@ -326,7 +336,12 @@ def plot_singleBeta_singleTau_allDataset(
 
 
 def join_images(
-    path: str, task: str, nd_box_start_r=1.6, cd_box_start_r=1.63, beta=int, tau=float
+    path: str,
+    task: str,
+    nd_box_start_r=1.6,
+    cd_box_start_r=1.63,
+    beta: float = None,
+    tau: float = None,
 ):
     # Dimensions images:
     # - length: 2625 pixels
@@ -334,11 +349,11 @@ def join_images(
 
     # Crop length: 1830px
     # Crop ratio: 2625 / 1830 = 1.4344
-    # crop_ratio = 1.5
-    if task == "node_hiding":
-        crop_ratio = 1.75
-    else:
-        crop_ratio = 1.8
+    crop_ratio = 1.6
+    # if task == "node_hiding":
+    #     crop_ratio = 1.75
+    # else:
+    #     crop_ratio = 1.8
 
     # White Square dimensions: (1600, 670) - (1830, 1160)
     # - crop ratio lenght: 2625 / 1600
@@ -352,20 +367,14 @@ def join_images(
     white_box_ratio_height2 = 1.468
 
     if task == "node_hiding":
-        # image1_path = path + f"/evaluation_{task}_sr_group.png"
-        image1_path = (
-            path + f"/allDataset_evaluation_{task}_sr_tau{tau}_beta{beta}_group.png"
-        )
+        image1_path = path + f"/evaluation_{task}_sr_group.png"
+        # image1_path = path + f"/allDataset_evaluation_{task}_sr_tau{tau}_beta{beta}_group.png"
     else:
-        # image1_path = path + f"/evaluation_{task}_ds_group.png"
-        image1_path = (
-            path + f"/allDataset_evaluation_{task}_ds_tau{tau}_beta{beta}_group.png"
-        )
+        image1_path = path + f"/evaluation_{task}_ds_group.png"
+        # image1_path = path + f"/allDataset_evaluation_{task}_ds_tau{tau}_beta{beta}_group.png"
 
-    # image2_path = path + f"/evaluation_{task}_nmi_group.png"
-    image2_path = (
-        path + f"/allDataset_evaluation_{task}_nmi_tau{tau}_beta{beta}_group.png"
-    )
+    image2_path = path + f"/evaluation_{task}_nmi_group.png"
+    # image2_path = path + f"/allDataset_evaluation_{task}_nmi_tau{tau}_beta{beta}_group.png"
 
     # Load your two 100x100 pixel images
     image1 = cv2.imread(image1_path)
@@ -409,15 +418,25 @@ def join_images(
     # cv2.imshow('Concatenated Image', concatenated_image)
     # Save the image
     if task == "node_hiding":
-        cv2.imwrite(
-            f"{path}/evaluation_{task}_sr-nmi_tau{tau}_beta{beta}_group.png",
-            concatenated_image,
-        )
+        if tau is None and beta is None:
+            cv2.imwrite(
+                f"{path}/evaluation_{task}_sr-nmi_group.png", concatenated_image
+            )
+        else:
+            cv2.imwrite(
+                f"{path}/evaluation_{task}_sr-nmi_tau{tau}_beta{beta}_group.png",
+                concatenated_image,
+            )
     else:
-        cv2.imwrite(
-            f"{path}/evaluation_{task}_ds-nmi_tau{tau}_beta{beta}_group.png",
-            concatenated_image,
-        )
+        if tau is None and beta is None:
+            cv2.imwrite(
+                f"{path}/evaluation_{task}_ds-nmi_group.png", concatenated_image
+            )
+        else:
+            cv2.imwrite(
+                f"{path}/evaluation_{task}_ds-nmi_tau{tau}_beta{beta}_group.png",
+                concatenated_image,
+            )
 
 
 def df_confidence_binary_test(x: pd.DataFrame):
@@ -440,24 +459,39 @@ def df_confidence_binary_test(x: pd.DataFrame):
     return (lower_bound, upper_bound)
 
 
+def confidence_binary_test(x: List[int]):
+    n = len(x)
+    p = sum(x) / n
+    z = 1.96  # 95% confidence level
+    std_error = math.sqrt(p * (1 - p) / n)
+    margin_of_error = z * std_error
+
+    lower_bound = p - margin_of_error
+    upper_bound = p + margin_of_error
+
+    # lower_bound *= 100
+    # upper_bound *= 100
+    return margin_of_error  # , (lower_bound, upper_bound)
+
+
 if __name__ == "__main__":
     ################ SINGLE DATASET - SINGLE TAU - ALL BETAS #################
-    TAU = "0.3"
-    DATASET = "words"
+    TAU = "0.8"
+    DATASET = "vote"
     ALG = "walktrap"
     # NODE HIDING
     PATH = f"old_tests/{DATASET}/{ALG}/node_hiding/" + f"tau_{TAU}"
-    # plot_singleDataset_singleTaus_allBetas(
-    #     file_path=PATH,
-    #     log_name="evaluation_node_hiding",
-    #     algs=["Agent", "Random", "Degree", "Roam"],
-    #     metrics=["goal", "nmi", "steps", "time"],
-    #     betas=[0.5, 1, 2],
-    # )
+    plot_singleDataset_singleTaus_allBetas(
+        file_path=PATH,
+        log_name="evaluation_node_hiding",
+        algs=["Agent", "Random", "Degree", "Roam"],
+        metrics=["goal", "nmi", "steps", "time"],
+        betas=[0.5, 1, 2],
+    )
 
-    # join_images(PATH, task="node_hiding", nd_box_start_r=1.58)
+    join_images(PATH, task="node_hiding", nd_box_start_r=1.58)
 
-    # # COMMUNITY HIDING
+    # COMMUNITY HIDING
     # PATH = f"test/{DATASET}/{ALG}/community_hiding/" + f"tau_{TAU}"
     # plot_singleDataset_singleTaus_allBetas(
     #     file_path=PATH,
@@ -469,31 +503,31 @@ if __name__ == "__main__":
     # join_images(PATH, task="community_hiding", cd_box_start_r=1.63)
 
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
-    DETECTION_ALG = "louvain"
-    PATH = "old_tests"
-    BETA = 1
-    TAU = 0.3
-    # NODE HIDING
-    plot_singleBeta_singleTau_allDataset(
-        PATH,
-        log_name="evaluation_node_hiding",
-        algs=["Agent", "Random", "Degree", "Roam"],
-        detection_alg=DETECTION_ALG,
-        metrics=["goal", "nmi", "steps", "time"],
-        datasets=["kar", "words", "vote"],
-        beta=BETA,
-        tau=TAU,
-    )
-    join_images(PATH, task="node_hiding", nd_box_start_r=1.58, beta=BETA, tau=TAU)
-    # COMMUNITY HIDING
-    plot_singleBeta_singleTau_allDataset(
-        PATH,
-        log_name="evaluation_community_hiding",
-        algs=["Agent", "Safeness", "Modularity"],
-        detection_alg=DETECTION_ALG,
-        metrics=["goal", "nmi", "deception_score", "steps", "time"],
-        datasets=["kar", "words", "vote"],
-        beta=BETA,
-        tau=TAU,
-    )
-    join_images(PATH, task="community_hiding", cd_box_start_r=1.63, beta=BETA, tau=TAU)
+    # DETECTION_ALG = "louvain"
+    # PATH = "old_tests"
+    # BETA = 1
+    # TAU = 0.3
+    # # NODE HIDING
+    # plot_singleBeta_singleTau_allDataset(
+    #     PATH,
+    #     log_name="evaluation_node_hiding",
+    #     algs=["Agent", "Random", "Degree", "Roam"],
+    #     detection_alg=DETECTION_ALG,
+    #     metrics=["goal", "nmi", "steps", "time"],
+    #     datasets=["kar", "words", "vote"],
+    #     beta=BETA,
+    #     tau=TAU,
+    # )
+    # join_images(PATH, task="node_hiding", nd_box_start_r=1.58, beta=BETA, tau=TAU)
+    # # COMMUNITY HIDING
+    # plot_singleBeta_singleTau_allDataset(
+    #     PATH,
+    #     log_name="evaluation_community_hiding",
+    #     algs=["Agent", "Safeness", "Modularity"],
+    #     detection_alg=DETECTION_ALG,
+    #     metrics=["goal", "nmi", "deception_score", "steps", "time"],
+    #     datasets=["kar", "words", "vote"],
+    #     beta=BETA,
+    #     tau=TAU,
+    # )
+    # join_images(PATH, task="community_hiding", cd_box_start_r=1.63, beta=BETA, tau=TAU)
