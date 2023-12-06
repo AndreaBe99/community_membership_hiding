@@ -214,26 +214,26 @@ def plot_singleBeta_singleTau_allDataset(
                 else:
                     metrics_dict[metric][dataset][alg] = data[alg][metric]
 
-                if log_name != "evaluation_node_hiding" and alg == "Agent":
-                    # Agent renamed has 300 values, the others 3, so we need to
-                    # compute the mean of the first 100 values, the second 100 values,
-                    # and the third 100 values
-                    # Get the first 100 values, and compute the mean
-                    first_100 = metrics_dict[metric][dataset][agent_renamed][:100]
-                    first_100_mean = mean(first_100)
-                    # Get the second 100 values, and compute the mean
-                    second_100 = metrics_dict[metric][dataset][agent_renamed][100:200]
-                    second_100_mean = mean(second_100)
-                    # Get the third 100 values, and compute the mean
-                    third_100 = metrics_dict[metric][dataset][agent_renamed][200:]
-                    third_100_mean = mean(third_100)
+                # if log_name != "evaluation_node_hiding" and alg == "Agent":
+                #     # Agent renamed has 300 values, the others 3, so we need to
+                #     # compute the mean of the first 100 values, the second 100 values,
+                #     # and the third 100 values
+                #     # Get the first 100 values, and compute the mean
+                #     first_100 = metrics_dict[metric][dataset][agent_renamed][:100]
+                #     first_100_mean = mean(first_100)
+                #     # Get the second 100 values, and compute the mean
+                #     second_100 = metrics_dict[metric][dataset][agent_renamed][100:200]
+                #     second_100_mean = mean(second_100)
+                #     # Get the third 100 values, and compute the mean
+                #     third_100 = metrics_dict[metric][dataset][agent_renamed][200:]
+                #     third_100_mean = mean(third_100)
 
-                    # Replace the values with the mean
-                    metrics_dict[metric][dataset][agent_renamed] = [
-                        first_100_mean,
-                        second_100_mean,
-                        third_100_mean,
-                    ]
+                #     # Replace the values with the mean
+                #     metrics_dict[metric][dataset][agent_renamed] = [
+                #         first_100_mean,
+                #         second_100_mean,
+                #         third_100_mean,
+                #     ]
 
     for metric in metrics:
         plot_data = []
@@ -446,7 +446,7 @@ if __name__ == "__main__":
     DATASET = "words"
     ALG = "walktrap"
     # NODE HIDING
-    PATH = f"test/old_tests/{DATASET}/{ALG}/node_hiding/" + f"tau_{TAU}"
+    PATH = f"old_tests/{DATASET}/{ALG}/node_hiding/" + f"tau_{TAU}"
     # plot_singleDataset_singleTaus_allBetas(
     #     file_path=PATH,
     #     log_name="evaluation_node_hiding",
@@ -469,11 +469,10 @@ if __name__ == "__main__":
     # join_images(PATH, task="community_hiding", cd_box_start_r=1.63)
 
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
-    DETECTION_ALG = "walktrap"
-    PATH = "test/"
-    BETA = 3
+    DETECTION_ALG = "louvain"
+    PATH = "old_tests"
+    BETA = 1
     TAU = 0.3
-
     # NODE HIDING
     plot_singleBeta_singleTau_allDataset(
         PATH,
@@ -481,7 +480,7 @@ if __name__ == "__main__":
         algs=["Agent", "Random", "Degree", "Roam"],
         detection_alg=DETECTION_ALG,
         metrics=["goal", "nmi", "steps", "time"],
-        datasets=["kar", "words", "vote", "pow"],
+        datasets=["kar", "words", "vote"],
         beta=BETA,
         tau=TAU,
     )
@@ -493,7 +492,7 @@ if __name__ == "__main__":
         algs=["Agent", "Safeness", "Modularity"],
         detection_alg=DETECTION_ALG,
         metrics=["goal", "nmi", "deception_score", "steps", "time"],
-        datasets=["kar", "words", "vote", "pow"],
+        datasets=["kar", "words", "vote"],
         beta=BETA,
         tau=TAU,
     )

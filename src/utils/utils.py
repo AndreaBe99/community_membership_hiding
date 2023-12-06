@@ -80,7 +80,7 @@ class HyperParams(Enum):
     # ! REAL GRAPH Graph path (change the following line to change the graph)
     GRAPH_NAME = FilePaths.FB_75.value
     # ! Define the detection algorithm to use (change the following line to change the algorithm)
-    DETECTION_ALG_NAME = DetectionAlgorithmsNames.GRE.value
+    DETECTION_ALG_NAME = DetectionAlgorithmsNames.WALK.value
     # Multiplier for the rewiring action number, i.e. (mean_degree * BETA)
     BETA = 1
     # ! Strength of the deception constraint, value between 0 (hard) and 1 (soft)

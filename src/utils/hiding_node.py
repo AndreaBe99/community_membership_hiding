@@ -153,6 +153,7 @@ class NodeHiding:
             # print("* Community Size:", self.agent.env.preferred_community_size)
             # Change the target community
             self.reset_experiment()
+            compute_baselines = True
             sizes.set_description(f"* * * Community Size {len(self.community_target)}")
             steps = trange(self.eval_steps, desc="Testing Episode", leave=False)
             for step in steps:
@@ -175,16 +176,17 @@ class NodeHiding:
                     f"* * * Testing Episode {step+1} | Random Rewiring"
                 )
                 self.run_alg(self.run_random)
+                if compute_baselines:
+                    # Degree Rewiring
+                    steps.set_description(
+                        f"* * * Testing Episode {step+1} | Degree Rewiring"
+                    )
+                    self.run_alg(self.run_degree)
 
-                # Degree Rewiring
-                steps.set_description(
-                    f"* * * Testing Episode {step+1} | Degree Rewiring"
-                )
-                self.run_alg(self.run_degree)
-
-                # Roam Rewiring
-                steps.set_description(f"* * * Testing Episode {step+1} | Roam Rewiring")
-                self.run_alg(self.run_roam)
+                    # Roam Rewiring
+                    steps.set_description(f"* * * Testing Episode {step+1} | Roam Rewiring")
+                    self.run_alg(self.run_roam)
+                    compute_baselines = False
 
         Utils.check_dir(self.path_to_save)
         Utils.save_test(

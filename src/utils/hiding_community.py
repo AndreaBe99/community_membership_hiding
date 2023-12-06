@@ -256,19 +256,18 @@ class CommunityHiding:
 
                 # ° --------- Baselines --------- ° #
                 if compute_baselines:
-                    # Safeness, it is computed only once because it is deterministic
+                    # Safeness
                     steps.set_description(
                         f"* * * * Testing Episode {step+1} | Safeness Rewiring"
                     )
                     self.run_alg(self.run_safeness)
-                    compute_baselines = False
-
-                    # Modularity, it is computed at each step because the edge deletion
-                    # is not deterministic
+                    
+                    # Modularity
                     steps.set_description(
                         f"* * * * Testing Episode {step+1} | Modularity Rewiring"
                     )
                     self.run_alg(self.run_modularity)
+                    compute_baselines = False
 
         Utils.check_dir(self.path_to_save)
         Utils.save_test(
