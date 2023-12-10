@@ -27,62 +27,84 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
 
-    # ° --- Environment Setup --- ° #
-    env = GraphEnvironment()
+    datasets = [
+        # FilePaths.ASTR.value,
+        # FilePaths.POW.value,
+        FilePaths.FB_75.value,
+        # FilePaths.KAR.value,
+        # FilePaths.WORDS.value,
+        # FilePaths.VOTE.value,
+        # FilePaths.NETS.value,
+    ]
+    detection_algs = [
+        # DetectionAlgorithmsNames.GRE.value,
+        DetectionAlgorithmsNames.LOUV.value,
+        DetectionAlgorithmsNames.WALK.value,
+    ]
 
-    # ° ------  Agent Setup ----- ° #
-    agent = Agent(env=env)
+    for dataset in datasets:
+        # ° --- Environment Setup --- ° #
+        env = GraphEnvironment(graph_path=dataset)
 
-    # ° ------    TRAIN    ------ ° #
-    if args.mode == "train" or args.mode == "both":
-        # Training
-        agent.grid_search()
+        # ° ------  Agent Setup ----- ° #
+        agent = Agent(env=env)
 
-    # ° ------    TEST    ------ ° #
-    elif args.mode == "test" or args.mode == "both":
-        # To change the detection algorithm, or the dataset, on which the model
-        # will be tested, please refer to the class HyperParams in the file
-        # src/utils/utils.py, changing the values of the variables:
-        # - GRAPH_NAME, for the dataset
-        # - DETECTION_ALG, for the detection algorithm
+        for alg in detection_algs:
+            print("Dataset: {} - Detection Algorithm: {}".format(dataset, alg))
+            agent.env.set_communities(alg)
 
-        # To change the model path, please refer to the class FilePaths in the
-        # file src/utils/utils.py
-        model_path = FilePaths.TRAINED_MODEL.value
+            # ° ------    TRAIN    ------ ° #
+            if args.mode == "train" or args.mode == "both":
+                # Training
+                agent.grid_search()
 
-        # Tau defines the strength of the constraint on the goal achievement
-        taus = [0.3] #, 0.5, 0.8]
-        # BETAs defines the number of actions to perform
-        # Beta for the community hiding task defines the percentage of rewiring
-        # action, add or remove edges
-        community_betas = [1, 3, 5, 10]
-        # Beta for the node hiding task is a multiplier of mean degree of the
-        # the graph
-        node_betas = [3, 15] #  [3, 5, 10, 15, 20]  # [1, 3, 5, 10]
+            # ° ------    TEST    ------ ° #
+            elif args.mode == "test" or args.mode == "both":
+                # To change the detection algorithm, or the dataset, on which the model
+                # will be tested, please refer to the class HyperParams in the file
+                # src/utils/utils.py, changing the values of the variables:
+                # - GRAPH_NAME, for the dataset
+                # - DETECTION_ALG, for the detection algorithm
 
-        # Initialize the test class
-        node_hiding = NodeHiding(agent=agent, model_path=model_path)
-        community_hiding = CommunityHiding(agent=agent, model_path=model_path)
+                # To change the model path, please refer to the class FilePaths in the
+                # file src/utils/utils.py
+                model_path = FilePaths.TRAINED_MODEL.value
 
-        print("* NOTE:")
-        print(
-            "*    - Beta for Node Hiding is a multiplier of the mean degree of the graph"
-        )
-        print(
-            "*    - Beta for Community Hiding is the percentage of rewiring action, add or remove edges"
-        )
-        for tau in taus:
-            print("* Node Hiding with tau = {}".format(tau))
-            for beta in node_betas:
-                print("* * Beta Node = {}".format(beta))
-                node_hiding.set_parameters(beta=beta, tau=tau)
-                node_hiding.run_experiment()
+                # Tau defines the strength of the constraint on the goal achievement
+                taus = [0.3] #, 0.5, 0.8]
+                # BETAs defines the number of actions to perform
+                # Beta for the community hiding task defines the percentage of rewiring
+                # action, add or remove edges
+                community_betas = [1, 3, 5, 10]
+                # Beta for the node hiding task is a multiplier of mean degree of the
+                # the graph
+                node_betas =   [5, 10, 20]  # [1, 3, 5, 10] # [0.5, 1, 2]
 
-        # print("* Community Hiding")  #  with tau = {}".format(tau))
-        # for beta in community_betas:
-        #     print("* * Beta Community = {}".format(beta))
-        #     community_hiding.set_parameters(beta=beta, tau=0.3)
-        #     community_hiding.run_experiment()
-        # print("* " * 50)
-    else:
-        raise ValueError("Invalid mode. Please choose between 'train' and 'test'")
+                # Initialize the test class
+                node_hiding = NodeHiding(agent=agent, model_path=model_path)
+                community_hiding = CommunityHiding(agent=agent, model_path=model_path)
+
+                print("* NOTE:")
+                print(
+                    "*    - Beta for Node Hiding is a multiplier of the mean degree of the graph"
+                )
+                print(
+                    "*    - Beta for Community Hiding is the percentage of rewiring action, add or remove edges"
+                )
+                for tau in taus:
+                    print("* Node Hiding with tau = {}".format(tau))
+                    for beta in node_betas:
+                        print("* * Beta Node = {}".format(beta))
+                        node_hiding.set_parameters(beta=beta, tau=tau)
+                        node_hiding.run_experiment()
+
+                # print("* Community Hiding")  #  with tau = {}".format(tau))
+                # for beta in community_betas:
+                #     print("* * Beta Community = {}".format(beta))
+                #     community_hiding.set_parameters(beta=beta, tau=0.3)
+                #     community_hiding.run_experiment()
+                # print("* " * 50)
+            else:
+                raise ValueError(
+                    "Invalid mode. Please choose between 'train' and 'test'"
+                )
