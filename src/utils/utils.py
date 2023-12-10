@@ -78,9 +78,9 @@ class HyperParams(Enum):
     """Hyperparameters for the Environment"""
 
     # ! REAL GRAPH Graph path (change the following line to change the graph)
-    GRAPH_NAME = FilePaths.FB_75.value
+    GRAPH_NAME = FilePaths.KAR.value
     # ! Define the detection algorithm to use (change the following line to change the algorithm)
-    DETECTION_ALG_NAME = DetectionAlgorithmsNames.WALK.value
+    DETECTION_ALG_NAME = DetectionAlgorithmsNames.LOUV.value
     # Multiplier for the rewiring action number, i.e. (mean_degree * BETA)
     BETA = 1
     # ! Strength of the deception constraint, value between 0 (hard) and 1 (soft)

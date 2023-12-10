@@ -93,9 +93,9 @@ class NodeHiding:
             + f"node_hiding/"
             + f"tau_{self.tau}/"
             + f"beta_{self.beta}/"
-            + f"eps_{self.epsilon_prob}/"
-            + f"lr_{self.lr}/gamma_{self.gamma}/"
-            + f"lambda_{self.lambda_metric}/alpha_{self.alpha_metric}/"
+            # + f"eps_{self.epsilon_prob}/"
+            # + f"lr_{self.lr}/gamma_{self.gamma}/"
+            # + f"lambda_{self.lambda_metric}/alpha_{self.alpha_metric}/"
         )
 
     def reset_experiment(self, target_community=True) -> None:
@@ -176,17 +176,17 @@ class NodeHiding:
                     f"* * * Testing Episode {step+1} | Random Rewiring"
                 )
                 self.run_alg(self.run_random)
-                if compute_baselines:
-                    # Degree Rewiring
-                    steps.set_description(
-                        f"* * * Testing Episode {step+1} | Degree Rewiring"
-                    )
-                    self.run_alg(self.run_degree)
+                # if compute_baselines:
+                # Degree Rewiring
+                steps.set_description(
+                    f"* * * Testing Episode {step+1} | Degree Rewiring"
+                )
+                self.run_alg(self.run_degree)
 
-                    # Roam Rewiring
-                    steps.set_description(f"* * * Testing Episode {step+1} | Roam Rewiring")
-                    self.run_alg(self.run_roam)
-                    compute_baselines = False
+                # Roam Rewiring
+                steps.set_description(f"* * * Testing Episode {step+1} | Roam Rewiring")
+                self.run_alg(self.run_roam)
+                # compute_baselines = False
 
         Utils.check_dir(self.path_to_save)
         Utils.save_test(

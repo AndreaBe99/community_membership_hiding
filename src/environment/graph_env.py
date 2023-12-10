@@ -217,9 +217,9 @@ class GraphEnvironment(object):
         """
         communities = self.original_community_structure.communities
         communities_len = [len(c) for c in communities]
-        preferred_size = (
-            int(np.ceil(max(communities_len) * self.preferred_community_size)) # / 2
-        )
+        preferred_size = int(
+            np.ceil(max(communities_len) * self.preferred_community_size)
+        )  # / 2
         closest = min(communities_len, key=lambda x: abs(x - preferred_size))
         self.community_target = communities[communities_len.index(closest)]
 
@@ -227,7 +227,7 @@ class GraphEnvironment(object):
         """
         Choose a community based on the distribution of the number of nodes in
         the communities
-        
+
         Parameters
         ----------
         min_len : int, optional
@@ -573,6 +573,11 @@ class GraphEnvironment(object):
         # TEST: Three different ways to compute the edge budget
 
         # 1. Mean degree of the graph times the parameter beta
+        if self.env_name == "pow":
+            return int(
+                (self.graph.number_of_edges() / self.graph.number_of_nodes() + 1)
+                * self.beta
+            )
         return int(
             self.graph.number_of_edges() / self.graph.number_of_nodes() * self.beta
         )

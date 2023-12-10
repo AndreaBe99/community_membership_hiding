@@ -245,26 +245,26 @@ def plot_singleBeta_singleTau_allDataset(
                 else:
                     metrics_dict[metric][dataset][alg] = data[alg][metric]
 
-                # if log_name != "evaluation_node_hiding" and alg == "Agent":
-                #     # Agent renamed has 300 values, the others 3, so we need to
-                #     # compute the mean of the first 100 values, the second 100 values,
-                #     # and the third 100 values
-                #     # Get the first 100 values, and compute the mean
-                #     first_100 = metrics_dict[metric][dataset][agent_renamed][:100]
-                #     first_100_mean = mean(first_100)
-                #     # Get the second 100 values, and compute the mean
-                #     second_100 = metrics_dict[metric][dataset][agent_renamed][100:200]
-                #     second_100_mean = mean(second_100)
-                #     # Get the third 100 values, and compute the mean
-                #     third_100 = metrics_dict[metric][dataset][agent_renamed][200:]
-                #     third_100_mean = mean(third_100)
+                if log_name != "evaluation_node_hiding" and alg == "Agent":
+                    # Agent renamed has 300 values, the others 3, so we need to
+                    # compute the mean of the first 100 values, the second 100 values,
+                    # and the third 100 values
+                    # Get the first 100 values, and compute the mean
+                    first_100 = metrics_dict[metric][dataset][agent_renamed][:100]
+                    first_100_mean = mean(first_100)
+                    # Get the second 100 values, and compute the mean
+                    second_100 = metrics_dict[metric][dataset][agent_renamed][100:200]
+                    second_100_mean = mean(second_100)
+                    # Get the third 100 values, and compute the mean
+                    third_100 = metrics_dict[metric][dataset][agent_renamed][200:]
+                    third_100_mean = mean(third_100)
 
-                #     # Replace the values with the mean
-                #     metrics_dict[metric][dataset][agent_renamed] = [
-                #         first_100_mean,
-                #         second_100_mean,
-                #         third_100_mean,
-                #     ]
+                    # Replace the values with the mean
+                    metrics_dict[metric][dataset][agent_renamed] = [
+                        first_100_mean,
+                        second_100_mean,
+                        third_100_mean,
+                    ]
 
     for metric in metrics:
         plot_data = []
@@ -388,14 +388,20 @@ def join_images(
     white_box_ratio_height2 = 1.468
 
     if task == "node_hiding":
-        image1_path = path + f"/evaluation_{task}_sr_group.png"
-        # image1_path = path + f"/allDataset_evaluation_{task}_sr_tau{tau}_beta{beta}_group.png"
+        # image1_path = path + f"/evaluation_{task}_sr_group.png"
+        image1_path = (
+            path + f"/allDataset_evaluation_{task}_sr_tau{tau}_beta{beta}_group.png"
+        )
     else:
-        image1_path = path + f"/evaluation_{task}_ds_group.png"
-        # image1_path = path + f"/allDataset_evaluation_{task}_ds_tau{tau}_beta{beta}_group.png"
+        # image1_path = path + f"/evaluation_{task}_ds_group.png"
+        image1_path = (
+            path + f"/allDataset_evaluation_{task}_ds_tau{tau}_beta{beta}_group.png"
+        )
 
-    image2_path = path + f"/evaluation_{task}_nmi_group.png"
-    # image2_path = path + f"/allDataset_evaluation_{task}_nmi_tau{tau}_beta{beta}_group.png"
+    # image2_path = path + f"/evaluation_{task}_nmi_group.png"
+    image2_path = (
+        path + f"/allDataset_evaluation_{task}_nmi_tau{tau}_beta{beta}_group.png"
+    )
 
     # Load your two 100x100 pixel images
     image1 = cv2.imread(image1_path)
@@ -497,59 +503,59 @@ def confidence_binary_test(x: List[int]):
 
 if __name__ == "__main__":
     ################ SINGLE DATASET - SINGLE TAU - ALL BETAS #################
-    TAU = "0.3"
-    DATASET = "pow"
-    ALG = "walktrap"
-    # NODE HIDING
-    PATH = f"test/{DATASET}/{ALG}/node_hiding/" + f"tau_{TAU}"
+    # TAU = "0.8"
+    # DATASET = "pow"
+    # ALG = "walktrap"
+    # # NODE HIDING
+    # PATH = f"test/{DATASET}/{ALG}/node_hiding/" + f"tau_{TAU}"
     # plot_singleDataset_singleTaus_allBetas(
     #     file_path=PATH,
     #     log_name="evaluation_node_hiding",
     #     algs=["Agent", "Random", "Degree", "Roam"],
     #     metrics=["goal", "nmi", "steps", "time"],
-    #     # betas=[0.5, 1, 2],
-    #     betas=[1, 3, 5, 10],
+    #     betas=[0.5, 1, 2],
+    #     # betas=[1, 3, 5, 10],
     # )
 
     # join_images(PATH, task="node_hiding", nd_box_start_r=1.58)
 
     # COMMUNITY HIDING
-    PATH = f"test/{DATASET}/{ALG}/community_hiding/" + f"tau_{TAU}"
-    plot_singleDataset_singleTaus_allBetas(
-        file_path=PATH,
-        log_name="evaluation_community_hiding",
-        algs=["Agent", "Safeness", "Modularity"],
-        metrics=["goal", "nmi", "deception_score", "steps", "time"],
-        # betas=[1, 3, 5],
-        betas=[1, 3, 5, 10],
-    )
-    join_images(PATH, task="community_hiding", cd_box_start_r=1.63)
+    # PATH = f"test/{DATASET}/{ALG}/community_hiding/" + f"tau_{TAU}"
+    # plot_singleDataset_singleTaus_allBetas(
+    #     file_path=PATH,
+    #     log_name="evaluation_community_hiding",
+    #     algs=["Agent", "Safeness", "Modularity"],
+    #     metrics=["goal", "nmi", "deception_score", "steps", "time"],
+    #     # betas=[1, 3, 5],
+    #     betas=[1, 3, 5, 10],
+    # )
+    # join_images(PATH, task="community_hiding", cd_box_start_r=1.63)
 
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
-    # DETECTION_ALG = "louvain"
-    # PATH = "old_tests"
-    # BETA = 1
-    # TAU = 0.3
-    # # NODE HIDING
-    # plot_singleBeta_singleTau_allDataset(
-    #     PATH,
-    #     log_name="evaluation_node_hiding",
-    #     algs=["Agent", "Random", "Degree", "Roam"],
-    #     detection_alg=DETECTION_ALG,
-    #     metrics=["goal", "nmi", "steps", "time"],
-    #     datasets=["kar", "words", "vote"],
-    #     beta=BETA,
-    #     tau=TAU,
-    # )
-    # join_images(PATH, task="node_hiding", nd_box_start_r=1.58, beta=BETA, tau=TAU)
-    # # COMMUNITY HIDING
+    DETECTION_ALG = "walktrap"
+    PATH = "test"
+    BETA = 2
+    TAU = 0.3
+    # NODE HIDING
+    plot_singleBeta_singleTau_allDataset(
+        PATH,
+        log_name="evaluation_node_hiding",
+        algs=["Agent", "Random", "Degree", "Roam"],
+        detection_alg=DETECTION_ALG,
+        metrics=["goal", "nmi", "steps", "time"],
+        datasets=["kar", "words", "vote", "pow"],
+        beta=BETA,
+        tau=TAU,
+    )
+    join_images(PATH, task="node_hiding", nd_box_start_r=1.58, beta=BETA, tau=TAU)
+    # COMMUNITY HIDING
     # plot_singleBeta_singleTau_allDataset(
     #     PATH,
     #     log_name="evaluation_community_hiding",
     #     algs=["Agent", "Safeness", "Modularity"],
     #     detection_alg=DETECTION_ALG,
     #     metrics=["goal", "nmi", "deception_score", "steps", "time"],
-    #     datasets=["kar", "words", "vote"],
+    #     datasets=["kar", "words", "vote", "pow"],
     #     beta=BETA,
     #     tau=TAU,
     # )

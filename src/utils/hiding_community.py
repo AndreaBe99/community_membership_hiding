@@ -136,9 +136,9 @@ class CommunityHiding:
             + f"community_hiding/"
             + f"tau_{self.tau}/"
             + f"beta_{self.beta}/"
-            + f"eps_{self.epsilon_prob}/"
-            + f"lr_{self.lr}/gamma_{self.gamma}/"
-            + f"lambda_{self.lambda_metric}/alpha_{self.alpha_metric}/"
+            # + f"eps_{self.epsilon_prob}/"
+            # + f"lr_{self.lr}/gamma_{self.gamma}/"
+            # + f"lambda_{self.lambda_metric}/alpha_{self.alpha_metric}/"
         )
 
     def reset_experiment(self) -> None:
