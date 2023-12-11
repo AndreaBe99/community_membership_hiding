@@ -537,8 +537,8 @@ class GraphEnvironment(object):
         """Set the rewiring budget for the graph, and the valid actions"""
         # Compute the action budget for the graph
         # TEST, use directly the beta parameter
-        self.edge_budget = self.beta
-        # self.edge_budget = self.get_edge_budget()
+        # self.edge_budget = self.beta
+        self.edge_budget = self.get_edge_budget()
         # Amount of budget used
         self.used_edge_budget = 0
         # Max Rewiring Steps during an episode, set a limit to avoid infinite
@@ -573,11 +573,12 @@ class GraphEnvironment(object):
         # TEST: Three different ways to compute the edge budget
 
         # 1. Mean degree of the graph times the parameter beta
-        if self.env_name == "pow":
+        if self.env_name == "pow" or self.env_name == "kar":
             return int(
                 (self.graph.number_of_edges() / self.graph.number_of_nodes() + 1)
                 * self.beta
             )
+
         return int(
             self.graph.number_of_edges() / self.graph.number_of_nodes() * self.beta
         )
