@@ -73,8 +73,7 @@ class DegreeHiding:
                 graph.remove_edge(*edge[::-1])
             else:
                 graph.add_edge(*edge)
-            # Update the degree of the node
-            possible_edges.append((edge[0], edge[1], graph.degree(edge[1])))
+            
 
             # TEST, do not compute the new community structure at each step
             # # Compute the new community structure
