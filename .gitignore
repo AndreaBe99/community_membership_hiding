@@ -188,3 +188,6 @@ src/models/vote/
 
 new_test/
 old_test/
+
+# TEMP
+test/
