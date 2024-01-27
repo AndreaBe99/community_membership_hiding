@@ -11,16 +11,17 @@ import os
 import networkx as nx
 import igraph as ig
 import matplotlib.pyplot as plt
-plt.style.use('default')
+
+plt.style.use("default")
 
 
 class CommunityDetectionAlgorithm(object):
     """Class for the community detection algorithms using iGraph"""
-    
+
     def __init__(self, alg_name: str) -> None:
         """
         Initialize the DetectionAlgorithm object
-        
+
         Parameters
         ----------
         alg_name : str
@@ -31,14 +32,14 @@ class CommunityDetectionAlgorithm(object):
 
     def networkx_to_igraph(self, graph: nx.Graph) -> ig.Graph:
         """
-        Convert NetworkX graph to iGraph graph, in this way we can use 
+        Convert NetworkX graph to iGraph graph, in this way we can use
         iGraph's community detection algorithms
-        
+
         Parameters
         ----------
         graph : nx.Graph
             The graph to be converted
-        
+
         Returns
         ----------
         ig.Graph
@@ -50,14 +51,14 @@ class CommunityDetectionAlgorithm(object):
     def compute_community(self, graph: nx.Graph, args: dict = None) -> List[List[int]]:
         """
         Compute the community detection algorithm
-        
+
         Parameters
         ----------
         graph : nx.Graph
             The graph to be computed
         args : dict
             The arguments for the algorithm
-        
+
         Returns
         ----------
         List[List[int]]
@@ -90,9 +91,11 @@ class CommunityDetectionAlgorithm(object):
         elif self.alg_name == da.SCD.value:
             return self.compute_scd(graph)
         else:
-            raise ValueError('Invalid algorithm name')
+            raise ValueError("Invalid algorithm name")
 
-    def vertexcluster_to_list(self, cluster: ig.VertexClustering) -> cdlib.NodeClustering:
+    def vertexcluster_to_list(
+        self, cluster: ig.VertexClustering
+    ) -> cdlib.NodeClustering:
         """
         Convert iGraph.VertexClustering object to list of list of vertices in each cluster
 
@@ -113,19 +116,19 @@ class CommunityDetectionAlgorithm(object):
 
     def plot_graph(self) -> plt:
         """Plot the graph using iGraph
-        
+
         Returns
         ---------
         plot: plt
             The plot of the graph
-        
+
         """
         # fig, ax = plt.subplots(figsize=(10, 10))
         plot = ig.plot(
             self.ig_graph,
             mark_groups=True,
             vertex_size=20,
-            edge_color='black',
+            edge_color="black",
             vertex_label=[v.index for v in self.ig_graph.vs],
             bbox=(0, 0, 500, 500),
             # target=ax,
@@ -135,7 +138,7 @@ class CommunityDetectionAlgorithm(object):
     def compute_louv(self, graph: ig.Graph, args_louv: dict) -> List[List[int]]:
         """
         Compute the Louvain community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
@@ -157,7 +160,7 @@ class CommunityDetectionAlgorithm(object):
     def compute_walk(self, graph: ig.Graph, args_walk: dict) -> List[List[int]]:
         """
         Compute the Walktrap community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
@@ -180,7 +183,7 @@ class CommunityDetectionAlgorithm(object):
     def compute_gre(self, graph: ig.Graph, args_gre: dict) -> List[List[int]]:
         """
         Compute the Greedy community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
@@ -203,7 +206,7 @@ class CommunityDetectionAlgorithm(object):
     def compute_inf(self, graph: ig.Graph, args_infomap: dict) -> List[List[int]]:
         """
         Compute the Infomap community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
@@ -225,7 +228,7 @@ class CommunityDetectionAlgorithm(object):
     def compute_lab(self, graph: ig.Graph, args_lab: dict) -> List[List[int]]:
         """
         Compute the Label Propagation community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
@@ -247,7 +250,7 @@ class CommunityDetectionAlgorithm(object):
     def compute_eig(self, graph: ig.Graph, args_eig: dict) -> List[List[int]]:
         """
         Compute the Eigenvector community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
@@ -269,7 +272,7 @@ class CommunityDetectionAlgorithm(object):
     def compute_btw(self, graph: ig.Graph, args_btw: dict) -> List[List[int]]:
         """
         Compute the Edge Betweenness community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
@@ -292,7 +295,7 @@ class CommunityDetectionAlgorithm(object):
     def compute_spin(self, graph: ig.Graph, args_spin: dict) -> List[List[int]]:
         """
         Compute the Spin Glass community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
@@ -314,7 +317,7 @@ class CommunityDetectionAlgorithm(object):
     def compute_opt(self, graph: ig.Graph, args_opt: dict) -> List[List[int]]:
         """
         Compute the Optimal community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
@@ -332,16 +335,16 @@ class CommunityDetectionAlgorithm(object):
         else:
             opt = graph.community_optimal_modularity(**args_opt)
         return self.vertexcluster_to_list(opt)
-    
+
     def compute_scd(self, graph: ig.Graph) -> List[List[int]]:
         """
         Compute the Surprise community detection algorithm
-        
+
         Parameters
         ----------
         graph : ig.Graph
             The graph to be clustered
-            
+
         Returns
         ----------
         List[List[int]]
@@ -351,13 +354,13 @@ class CommunityDetectionAlgorithm(object):
         self.write_graph_to_file(graph, "output.txt")
         # Execute SCD algorithm from the git submodule
         os.system("./../src/SCD/build/scd -f output.txt")
-        result_list = self.read_data_from_file('communities.dat')
+        result_list = self.read_data_from_file("communities.dat")
         return result_list
-    
+
     @staticmethod
     def write_graph_to_file(graph: ig.Graph, file_path: str) -> None:
         """
-        Write the graph to a text file, where each line is an 
+        Write the graph to a text file, where each line is an
         edge in the graph.
 
         Parameters
@@ -367,7 +370,7 @@ class CommunityDetectionAlgorithm(object):
         file_path : str
             file path of the output file
         """
-        with open(file_path, 'w', encoding='utf-8') as file:
+        with open(file_path, "w", encoding="utf-8") as file:
             for edge in graph.get_edgelist():
                 # To ensure we don't duplicate edges (x, y) and (y, x)
                 if edge[0] < edge[1]:
@@ -390,11 +393,12 @@ class CommunityDetectionAlgorithm(object):
             List of lists, where each row list of nodes is a community.
         """
         data_list = []
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             for line in file:
                 numbers = [int(num) for num in line.strip().split()]
                 data_list.append(numbers)
         return data_list
+
 
 '''
 class CommunityDetectionAlgorithm(object):
