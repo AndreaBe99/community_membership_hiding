@@ -12,7 +12,6 @@ import os
 import numpy as np
 
 
-
 def plot_singleBeta_singleTau_allDataset(
     file_path: str,
     log_name: str,
@@ -42,11 +41,11 @@ def plot_singleBeta_singleTau_allDataset(
     """
     # Renae the "Agent" key to "DRL-Agent (ours)"
     agent_renamed = "DRL-Agent (ours)"
+    centrality_renamed = "Betweenness"
 
-    
     # Add the metrics that is the ratio between the SR and the NMI
-    metrics.append("ratio")
-    
+    metrics.append(METRIC_NAME)
+
     # Save a dictionary with the first level keys is the metric, the second
     # level keys is the dataset, the third level keys is the algorithm
     metrics_dict = {}
@@ -54,7 +53,7 @@ def plot_singleBeta_singleTau_allDataset(
         metrics_dict[metric] = {}
         for dataset in datasets:
             metrics_dict[metric][dataset] = {}
-    
+
     for dataset in datasets:
         # Load the path of the json file: dataset/detection_alg/node_hiding/tau/beta
         if log_name == "evaluation_node_hiding":
@@ -64,21 +63,37 @@ def plot_singleBeta_singleTau_allDataset(
         # Load the json file
         with open(json_path, "r") as f:
             data = json.load(f)
-        
+
         for metric in metrics:
             for alg in algs:
-                if metric == "ratio":
+                if metric == METRIC_NAME:
                     # Compute the ratio between the SR and the NMI
                     if log_name == "evaluation_node_hiding":
                         temp_metric = "goal"
                     else:
                         temp_metric = "deception_score"
-                    data[alg][metric] = [x / y for x, y in zip(data[alg][temp_metric], data[alg]["nmi"])]
-                    # if dataset == "words":
-                    #    print(data[alg][metric])
-                    
+
+                    if metric == "SR*NMI":
+                        data[alg][metric] = [
+                            x * y for x, y in zip(data[alg]["goal"], data[alg]["nmi"])
+                        ]
+                    elif metric == "SR/(1-NMI)":
+                        data[alg][metric] = [
+                            x / (1 - y if y != 1 else 0.9999999)
+                            for x, y in zip(data[alg]["goal"], data[alg]["nmi"])
+                        ]
+                    elif metric == "F1":
+                        data[alg][metric] = [
+                            (2 * x * y) / (x + y)
+                            for x, y in zip(data[alg][temp_metric], data[alg]["nmi"])
+                        ]
+
                 if alg == "Agent":
                     metrics_dict[metric][dataset][agent_renamed] = data[alg][metric]
+                elif alg == "Centrality":
+                    metrics_dict[metric][dataset][centrality_renamed] = data[alg][
+                        metric
+                    ]
                 else:
                     metrics_dict[metric][dataset][alg] = data[alg][metric]
 
@@ -102,9 +117,9 @@ def plot_singleBeta_singleTau_allDataset(
                         second_100_mean,
                         third_100_mean,
                     ]
-    
+
     # Delete all metric from metrics, except "ratio"
-    metrics = ["ratio"]
+    metrics = [METRIC_NAME]
     for metric in metrics:
         plot_data = []
         for dataset in datasets:
@@ -115,6 +130,8 @@ def plot_singleBeta_singleTau_allDataset(
                 df = df.apply(lambda x: x * 100)
             # Rename the columns called "Agent" to "DRL-Agent (ours)"
             df = df.rename(columns={"Agent": agent_renamed})
+            # Rename the column called "Centrality" to "Betweenness"
+            df = df.rename(columns={"Centrality": "Betweenness"})
             # Add the dataframe to the plot_data
             plot_data.append(df)
 
@@ -122,6 +139,8 @@ def plot_singleBeta_singleTau_allDataset(
         df = pd.concat(plot_data, axis=1)
         # in algs list replace "Agent" with "DRL-Agent (ours)"
         algs = [agent_renamed if alg == "Agent" else alg for alg in algs]
+        # in algs list replace "Centrality" with "Betweenness"
+        algs = [centrality_renamed if alg == "Centrality" else alg for alg in algs]
         df.columns = pd.MultiIndex.from_product([datasets, algs])
         # Melt the dataframe
         df = df.melt(var_name=["Dataset", "Algorithm"], value_name=metric)
@@ -142,14 +161,14 @@ def plot_singleBeta_singleTau_allDataset(
         else:
             errorbar = None
 
-        if metric == "goal" or metric == "ratio":
+        if metric == "goal" or metric == METRIC_NAME:
             g = sns.catplot(
                 data=df,
                 kind="bar",
                 x="Dataset",
                 y=metric,
                 hue="Algorithm",
-                aspect=1.2,
+                aspect=1.5,
                 palette=palette,
                 errorbar="ci",
                 # errorbar=df_confidence_binary_test,
@@ -163,7 +182,7 @@ def plot_singleBeta_singleTau_allDataset(
                 x="Dataset",
                 y=metric,
                 hue="Algorithm",
-                aspect=1.2,
+                aspect=1.5,
                 palette=palette,
                 errorbar=errorbar,
             )
@@ -175,12 +194,12 @@ def plot_singleBeta_singleTau_allDataset(
             g.set(ylim=(0, 100))
             g.set_yticklabels(["0%", "20%", "40%", "60%", "80%", "100%"])
             g.set_ylabels("Success Rate")
-        elif metric == "ratio":
+        elif metric == METRIC_NAME:
             # g.set(ylim=(0, 1))
             if log_name == "evaluation_node_hiding":
-                g.set_ylabels("SR/NMI")
+                g.set_ylabels(METRIC_NAME)
             elif log_name == "evaluation_community_hiding":
-                g.set_ylabels("DS/NMI")
+                g.set_ylabels(METRIC_NAME)
         elif metric == "nmi":
             g.set(ylim=(0, 1))
             g.set_ylabels("NMI (avg)")
@@ -193,7 +212,7 @@ def plot_singleBeta_singleTau_allDataset(
         elif metric == "time":
             g.set_ylabels("Time in sec. (avg)")
 
-        sns.move_legend(g, "upper left", bbox_to_anchor=(0.64, 0.8), frameon=False)
+        sns.move_legend(g, "upper left", bbox_to_anchor=(0.75, 0.8), frameon=False)
 
         # Change the text of the first field of the legend
         # replace labels
@@ -206,10 +225,11 @@ def plot_singleBeta_singleTau_allDataset(
 
         # Save the plot
         g.savefig(
-            f"{file_path}/allDataset_{log_name}_{metric}_tau{tau}_beta{beta}_group.png",
+            f"{file_path}/allDataset_{log_name}_{metric.replace('/', '-')}_tau{tau}_beta{beta}_group.png",
             bbox_inches="tight",
             dpi=300,
         )
+
 
 def df_confidence_binary_test(x: pd.DataFrame):
     x = x.apply(lambda x: 1 if x == 100 else 0)
@@ -249,16 +269,19 @@ def confidence_binary_test(x: List[int]):
 if __name__ == "__main__":
 
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
-    DETECTION_ALG = "walktrap"
+    DETECTION_ALG = "greedy"
     PATH = "test"
     TYPE = 1  # 0: allBeta, 1: allDataset
     BETA = 1
-    TAU = 0.3
+    TAU = 0.5
+
+    metrics_test = ["F1", "SR*NMI", "SR/(1-NMI)"]
+    METRIC_NAME = metrics_test[0]
     # NODE HIDING
     plot_singleBeta_singleTau_allDataset(
         PATH,
         log_name="evaluation_node_hiding",
-        algs=["Agent", "Random", "Degree", "Roam"],
+        algs=["Agent", "Random", "Degree", "Centrality", "Roam"],
         detection_alg=DETECTION_ALG,
         metrics=["goal", "nmi", "steps", "time"],
         datasets=["kar", "words", "vote", "pow", "fb-75"],
