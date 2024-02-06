@@ -180,14 +180,12 @@ centrality_full_budget_v1/
 centrality_full_budget_v2/
 
 # EXCLUDE USELESS CODE
-src/utils/manually/plot_from_json.py
+src/utils/manually/plot/plot_from_json.py
 
 src/models/nets/
 src/models/pow/
 src/models/vote/
 
-new_test/
-old_test/
-
 # TEMP
-test/
+test_old/
+test_eigen/
