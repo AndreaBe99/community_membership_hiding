@@ -5,6 +5,33 @@ def split(md_table):
     return header, data_rows
 
 
+def markdown_to_latex_single(markdown_table):
+    header, data_rows = split(markdown_table)
+    latex_code = ""
+    for row in data_rows:
+        tau, beta, *values = [cell.strip() for cell in row]
+
+        beta = beta.replace("$", "")
+        if beta == "0.5 \mu":
+            beta = "$\\frac{1}{2} \mu$"
+        else:
+            beta = f"${beta}$"
+
+        latex_code += f"& {beta}"
+        for value in values:
+            mean, std = [s.strip() for s in value.split("±")]
+            mean = mean.replace("%", "")
+            # cast mean to one decimal
+            mean = f"{float(mean):.1f}"
+            std = std.replace("%", "")
+            # cast std to one decimal
+            std = f"{float(std):.1f}"
+            latex_code += f" & ${mean}\\% \\pm {std}\\%$"
+
+        latex_code += " \\\\\n"
+    return latex_code
+
+
 def markdown_to_latex(markdown_table_greedy, markdown_table_louvain):
     header_g, data_rows_g = split(markdown_table_greedy)
     header_l, data_rows_l = split(markdown_table_louvain)
@@ -44,10 +71,10 @@ def markdown_to_latex(markdown_table_greedy, markdown_table_louvain):
 
 # Inserisci le tabelle Markdown
 markdown_table_greedy = """
-|   τ |   β | DRL-Agent (ours)   | Safeness    | Modularity   |
-| 0.3 |   1 | 0.41 ± 0.03        | 0.44 ± 0.05 | 0.44 ± 0.05  |
-| 0.3 |   3 | 0.44 ± 0.04        | 0.44 ± 0.05 | 0.44 ± 0.05  |
-| 0.3 |   5 | 0.43 ± 0.04        | 0.44 ± 0.04 | 0.44 ± 0.05  |
+|   τ | β         | DRL-Agent (ours)   | Random         | Degree         | Centrality     | Roam           |
+| 0.5 | 0.5 $\mu$ | 31.67% ± 5.26%     | 20.33% ± 4.55% | 10.33% ± 3.44% | 12.00% ± 3.68% | 12.00% ± 3.68% |
+| 0.5 | 1 $\mu$   | 32.33% ± 5.29%     | 27.00% ± 5.02% | 13.00% ± 3.81% | 19.00% ± 4.44% | 12.33% ± 3.72% |
+| 0.5 | 2 $\mu$   | 36.00% ± 5.43%     | 33.67% ± 5.35% | 16.33% ± 4.18% | 22.33% ± 4.71% | 18.33% ± 4.38% |
 """
 
 markdown_table_louvain = """
@@ -58,8 +85,8 @@ markdown_table_louvain = """
 """
 
 # Converti le tabelle Markdown in codice LaTeX
-latex_code_greedy = markdown_to_latex(markdown_table_greedy, markdown_table_louvain)
-
+# latex_code_greedy = markdown_to_latex(markdown_table_greedy, markdown_table_louvain)
+latex_code_greedy = markdown_to_latex_single(markdown_table_greedy)
 
 # Stampa il codice LaTeX
 print(latex_code_greedy)

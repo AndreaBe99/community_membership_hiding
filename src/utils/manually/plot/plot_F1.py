@@ -168,7 +168,7 @@ def plot_singleBeta_singleTau_allDataset(
                 x="Dataset",
                 y=metric,
                 hue="Algorithm",
-                aspect=1.5,
+                aspect=2,
                 palette=palette,
                 errorbar="ci",
                 # errorbar=df_confidence_binary_test,
@@ -182,7 +182,7 @@ def plot_singleBeta_singleTau_allDataset(
                 x="Dataset",
                 y=metric,
                 hue="Algorithm",
-                aspect=1.5,
+                aspect=2,
                 palette=palette,
                 errorbar=errorbar,
             )
@@ -269,7 +269,7 @@ def confidence_binary_test(x: List[int]):
 if __name__ == "__main__":
 
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
-    DETECTION_ALG = "greedy"
+    DETECTION_ALG = "walktrap"
     PATH = "test"
     TYPE = 1  # 0: allBeta, 1: allDataset
     BETA = 1

@@ -202,8 +202,8 @@ def save_lineplot(df_sr, df_nmi):
 
 if __name__ == "__main__":
     # Specify the tau values
-    # tau_values = [0.3, 0.5, 0.8]
-    tau_values = [0.3]
+    tau_values = [0.3, 0.5, 0.8]
+    # tau_values = [0.3]
 
     # Load JSON data and process for each tau value
     for tau_value in tau_values:
@@ -211,7 +211,7 @@ if __name__ == "__main__":
         path = f"test/"
         dataset = "fb-75/"
         algorithm = "walktrap/"
-        task = "community_hiding"
+        task = "node_hiding"
         tau = f"/tau_{tau_value}/"
         json_file = f"allBetas_evaluation_{task}_mean_std.json"
 
