@@ -6,6 +6,7 @@ from src.agent.agent import Agent
 from src.community_algs.baselines.node_hiding.random_hiding import RandomHiding
 from src.community_algs.baselines.node_hiding.degree_hiding import DegreeHiding
 from src.community_algs.baselines.node_hiding.roam_hiding import RoamHiding
+from src.community_algs.baselines.node_hiding.centrality_hiding import CentralityHiding
 
 from typing import List, Callable, Tuple
 from tqdm import trange
@@ -60,7 +61,9 @@ class NodeHiding:
         self.max_steps = None
 
         # HyperParams.ALGS_EVAL.value
-        self.evaluation_algs = ["Agent", "Random", "Degree", "Roam"]
+        # self.evaluation_algs = ["Agent", "Random", "Degree", "Roam", "Centrality"]
+        #TEST
+        self.evaluation_algs = ["Random", "Degree", "Centrality", "Roam"]
 
     def set_parameters(self, beta: int, tau: float) -> None:
         """Set the environment with the new parameters, for new experiments
@@ -130,6 +133,12 @@ class NodeHiding:
         self.roam_hiding = RoamHiding(
             self.original_graph, self.node_target, self.edge_budget, self.detection_alg
         )
+        
+        self.centrality_hiding = CentralityHiding(
+            env=self.agent.env,
+            steps=self.edge_budget,
+            target_community=self.community_target,
+        )
 
     ############################################################################
     #                               EVALUATION                                 #
@@ -164,11 +173,13 @@ class NodeHiding:
                 # Change target node within the community
                 self.reset_experiment(target_community=False)
 
-                # ° ------ Agent Rewiring ------ ° #
-                steps.set_description(
-                    f"* * * Testing Episode {step+1} | Agent Rewiring"
-                )
-                self.run_alg(self.run_agent)
+                SKIP = True
+                if not SKIP:
+                    # ° ------ Agent Rewiring ------ ° #
+                    steps.set_description(
+                        f"* * * Testing Episode {step+1} | Agent Rewiring"
+                    )
+                    self.run_alg(self.run_agent)
 
                 # ° ------   Baselines   ------ ° #
                 # Random Rewiring
@@ -187,6 +198,9 @@ class NodeHiding:
                 steps.set_description(f"* * * Testing Episode {step+1} | Roam Rewiring")
                 self.run_alg(self.run_roam)
                 # compute_baselines = False
+                
+                steps.set_description(f"* * * Testing Episode {step+1} | Centrality Rewiring")
+                self.run_alg(self.run_centrality)
 
         Utils.check_dir(self.path_to_save)
         Utils.save_test(
@@ -248,7 +262,7 @@ class NodeHiding:
         )
 
         return (
-            self.evaluation_algs[0],
+            "Agent",
             self.agent.env.new_community_structure,
             self.agent.env.used_edge_budget,
         )
@@ -270,7 +284,7 @@ class NodeHiding:
             rh_communities,
             steps,
         ) = self.random_hiding.hide_target_node_from_community()
-        return self.evaluation_algs[1], rh_communities, steps
+        return "Random", rh_communities, steps
 
     def run_degree(self) -> Tuple[str, cdlib.NodeClustering, int]:
         """
@@ -286,7 +300,7 @@ class NodeHiding:
             dh_communities,
             steps,
         ) = self.degree_hiding.hide_target_node_from_community()
-        return self.evaluation_algs[2], dh_communities, steps
+        return "Degree", dh_communities, steps
 
     def run_roam(self) -> Tuple[str, cdlib.NodeClustering, int]:
         """
@@ -298,8 +312,23 @@ class NodeHiding:
             Algorithm name, Set of new communities, steps
         """
         ro_graph, ro_communities = self.roam_hiding.roam_heuristic(self.edge_budget)
-        return self.evaluation_algs[3], ro_communities, self.edge_budget
+        return "Roam", ro_communities, self.edge_budget
 
+    def run_centrality(self) -> Tuple[str, cdlib.NodeClustering, int]:
+        """
+        Evaluate the Roam Hiding algorithm on the Node Hiding task
+
+        Returns
+        -------
+        Tuple[str, cdlib.NodeClustering, int]:
+            Algorithm name, Set of new communities, steps
+        """
+        (
+            ch_graph,
+            ch_communities,
+            steps,
+        ) = self.centrality_hiding.hide_target_node_from_community()
+        return "Centrality", ch_communities, steps
     ############################################################################
     #                               UTILS                                      #
     ############################################################################
@@ -412,11 +441,12 @@ class NodeHiding:
         self.log_dict["env"]["max_steps"] = self.max_steps
 
         # Add Agent Hyperparameters to the log dictionary
-        self.log_dict["Agent"]["lr"] = self.lr
-        self.log_dict["Agent"]["gamma"] = self.gamma
-        self.log_dict["Agent"]["lambda_metric"] = self.lambda_metric
-        self.log_dict["Agent"]["alpha_metric"] = self.alpha_metric
-        self.log_dict["Agent"]["epsilon_prob"] = self.epsilon_prob
+        # TEST Centrality
+        # self.log_dict["Agent"]["lr"] = self.lr
+        # self.log_dict["Agent"]["gamma"] = self.gamma
+        # self.log_dict["Agent"]["lambda_metric"] = self.lambda_metric
+        # self.log_dict["Agent"]["alpha_metric"] = self.alpha_metric
+        # self.log_dict["Agent"]["epsilon_prob"] = self.epsilon_prob
 
     def save_metrics(
         self, alg: str, goal: int, nmi: float, time: float, steps: int
