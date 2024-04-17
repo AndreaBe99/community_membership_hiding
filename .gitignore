@@ -189,3 +189,29 @@ src/models/vote/
 # TEMP
 test_old/
 test_eigen/
+test_latest/
+
+# NOT COMPLETED TESTS
+test_review/kar/walktrap/
+test_review/kar/greedy/node_hiding/tau_0.3/
+test_review/kar/greedy/node_hiding/tau_0.8/
+test_review/kar/louvain/node_hiding/tau_0.3/
+test_review/kar/louvain/node_hiding/tau_0.8/
+
+test_review/words/vote/walktrap/
+test_review/words/vote/greedy/node_hiding/tau_0.3/
+test_review/words/vote/greedy/node_hiding/tau_0.8/
+test_review/words/vote/louvain/node_hiding/tau_0.3/
+test_review/words/vote/louvain/node_hiding/tau_0.8/
+
+test_review/vote/walktrap/
+test_review/vote/greedy/node_hiding/tau_0.3/
+test_review/vote/greedy/node_hiding/tau_0.8/
+test_review/vote/louvain/node_hiding/tau_0.3/
+test_review/vote/louvain/node_hiding/tau_0.8/
+
+test_review/pow/walktrap/
+test_review/pow/greedy/node_hiding/tau_0.3/
+test_review/pow/greedy/node_hiding/tau_0.8/
+test_review/pow/louvain/node_hiding/tau_0.3/
+test_review/pow/louvain/node_hiding/tau_0.8/
