@@ -7,6 +7,7 @@ from src.community_algs.baselines.node_hiding.random_hiding import RandomHiding
 from src.community_algs.baselines.node_hiding.degree_hiding import DegreeHiding
 from src.community_algs.baselines.node_hiding.roam_hiding import RoamHiding
 from src.community_algs.baselines.node_hiding.centrality_hiding import CentralityHiding
+from src.community_algs.baselines.node_hiding.greedy_hiding import GreedyHiding
 
 from typing import List, Callable, Tuple
 from tqdm import trange
@@ -61,9 +62,16 @@ class NodeHiding:
         self.max_steps = None
 
         # HyperParams.ALGS_EVAL.value
-        # self.evaluation_algs = ["Agent", "Random", "Degree", "Roam", "Centrality"]
-        #TEST
-        self.evaluation_algs = ["Random", "Degree", "Centrality", "Roam"]
+        self.evaluation_algs = [
+            "Agent",
+            "Random",
+            "Degree",
+            "Roam",
+            "Centrality",
+            "Greedy",
+        ]
+        # TEST
+        # self.evaluation_algs = ["Greedy"]
 
     def set_parameters(self, beta: int, tau: float) -> None:
         """Set the environment with the new parameters, for new experiments
@@ -133,8 +141,14 @@ class NodeHiding:
         self.roam_hiding = RoamHiding(
             self.original_graph, self.node_target, self.edge_budget, self.detection_alg
         )
-        
+
         self.centrality_hiding = CentralityHiding(
+            env=self.agent.env,
+            steps=self.edge_budget,
+            target_community=self.community_target,
+        )
+
+        self.greedy_hiding = GreedyHiding(
             env=self.agent.env,
             steps=self.edge_budget,
             target_community=self.community_target,
@@ -162,7 +176,7 @@ class NodeHiding:
             # print("* Community Size:", self.agent.env.preferred_community_size)
             # Change the target community
             self.reset_experiment()
-            compute_baselines = True
+
             sizes.set_description(f"* * * Community Size {len(self.community_target)}")
             steps = trange(self.eval_steps, desc="Testing Episode", leave=False)
             for step in steps:
@@ -173,13 +187,11 @@ class NodeHiding:
                 # Change target node within the community
                 self.reset_experiment(target_community=False)
 
-                SKIP = True
-                if not SKIP:
-                    # ° ------ Agent Rewiring ------ ° #
-                    steps.set_description(
-                        f"* * * Testing Episode {step+1} | Agent Rewiring"
-                    )
-                    self.run_alg(self.run_agent)
+                # ° ------ Agent Rewiring ------ ° #
+                steps.set_description(
+                    f"* * * Testing Episode {step+1} | Agent Rewiring"
+                )
+                self.run_alg(self.run_agent)
 
                 # ° ------   Baselines   ------ ° #
                 # Random Rewiring
@@ -187,7 +199,7 @@ class NodeHiding:
                     f"* * * Testing Episode {step+1} | Random Rewiring"
                 )
                 self.run_alg(self.run_random)
-                # if compute_baselines:
+
                 # Degree Rewiring
                 steps.set_description(
                     f"* * * Testing Episode {step+1} | Degree Rewiring"
@@ -198,9 +210,16 @@ class NodeHiding:
                 steps.set_description(f"* * * Testing Episode {step+1} | Roam Rewiring")
                 self.run_alg(self.run_roam)
                 # compute_baselines = False
-                
-                steps.set_description(f"* * * Testing Episode {step+1} | Centrality Rewiring")
+
+                steps.set_description(
+                    f"* * * Testing Episode {step+1} | Centrality Rewiring"
+                )
                 self.run_alg(self.run_centrality)
+
+                steps.set_description(
+                    f"* * * Testing Episode {step+1} | Greedy Rewiring"
+                )
+                self.run_alg(self.run_greedy)
 
         Utils.check_dir(self.path_to_save)
         Utils.save_test(
@@ -329,6 +348,23 @@ class NodeHiding:
             steps,
         ) = self.centrality_hiding.hide_target_node_from_community()
         return "Centrality", ch_communities, steps
+
+    def run_greedy(self) -> Tuple[str, cdlib.NodeClustering, int]:
+        """
+        Evaluate the Roam Hiding algorithm on the Node Hiding task
+
+        Returns
+        -------
+        Tuple[str, cdlib.NodeClustering, int]:
+            Algorithm name, Set of new communities, steps
+        """
+        (
+            gh_graph,
+            gh_communities,
+            steps,
+        ) = self.greedy_hiding.hide_target_node_from_community()
+        return "Greedy", gh_communities, steps
+
     ############################################################################
     #                               UTILS                                      #
     ############################################################################
