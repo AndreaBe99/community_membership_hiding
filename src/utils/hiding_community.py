@@ -228,6 +228,47 @@ class CommunityHiding:
             self.budget_per_node[node] = new_budget
             remaining_budget -= new_budget
 
+    def compute_budget_betweenness(
+        self, graph: nx.Graph, community_target: List[int], k=3
+    ) -> None:
+        """
+        Compute the budget for each node in the target community, proportionally
+        to the betweenness centrality of each node.
+
+        Parameters
+        ----------
+        graph : nx.Graph
+            Graph on which the agent is acting
+        community_target : List[int]
+            Target community
+        k : int, optional
+            Number of nodes to allocate the budget, by default 3
+        """
+        betweenness = nx.betweenness_centrality(graph)
+        # Order the nodes in descending order based on their degree of centrality
+        sorted_nodes = sorted(
+            community_target, key=lambda node: betweenness[node], reverse=True
+        )
+        
+        # Calculate the total degree of centrality of the first k nodes of the community
+        total_betweenness = sum(betweenness[node] for node in sorted_nodes[:k])
+
+        remaining_budget = self.community_edge_budget
+        self.budget_per_node = {}
+
+        for node in sorted_nodes[:k]:
+            centrality = betweenness[node]
+            proportion = centrality / total_betweenness
+            new_budget = min(
+                self.community_edge_budget,
+                math.ceil(self.community_edge_budget * proportion),
+            )
+            self.budget_per_node[node] = new_budget
+            remaining_budget -= new_budget
+        
+        for node in sorted_nodes[k:]:
+            self.budget_per_node[node] = 0
+
     def run_experiment(self) -> None:
         # Start evaluation
         preferred_size_list = HyperParams.PREFERRED_COMMUNITY_SIZE.value
@@ -244,7 +285,10 @@ class CommunityHiding:
 
             steps = trange(self.eval_steps, desc="* * * * Testing Episode", leave=False)
             for step in steps:
-                self.compute_budget_proportionally(
+                # self.compute_budget_proportionally(
+                #     self.original_graph, self.community_target
+                # )
+                self.compute_budget_betweenness(
                     self.original_graph, self.community_target
                 )
                 # ° ------ Agent Rewiring ------ ° #
@@ -261,7 +305,7 @@ class CommunityHiding:
                         f"* * * * Testing Episode {step+1} | Safeness Rewiring"
                     )
                     self.run_alg(self.run_safeness)
-                    
+
                     # Modularity
                     steps.set_description(
                         f"* * * * Testing Episode {step+1} | Modularity Rewiring"

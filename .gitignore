@@ -215,3 +215,5 @@ test_review/pow/greedy/node_hiding/tau_0.3/
 test_review/pow/greedy/node_hiding/tau_0.8/
 test_review/pow/louvain/node_hiding/tau_0.3/
 test_review/pow/louvain/node_hiding/tau_0.8/
+
+DeepRobust/

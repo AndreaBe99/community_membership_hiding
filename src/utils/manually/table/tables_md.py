@@ -209,8 +209,8 @@ if __name__ == "__main__":
     for tau_value in tau_values:
         # Load JSON data from file
         path = f"test/"
-        dataset = "fb-75/"
-        algorithm = "walktrap/"
+        dataset = "words/"
+        algorithm = "greedy/"
         task = "node_hiding"
         tau = f"/tau_{tau_value}/"
         json_file = f"allBetas_evaluation_{task}_mean_std.json"

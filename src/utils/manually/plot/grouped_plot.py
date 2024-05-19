@@ -576,34 +576,35 @@ if __name__ == "__main__":
     # join_images(PATH, task="community_hiding", cd_box_start_r=1.63)
 
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
-    DETECTION_ALG = "walktrap"
+    DETECTION_ALG = "louvain"
     PATH = "test"
     TYPE = 1  # 0: allBeta, 1: allDataset
+    BETA = 1
+    TAU = 0.5
+    # NODE HIDING
+    plot_singleBeta_singleTau_allDataset(
+        PATH,
+        log_name="evaluation_node_hiding",
+        algs=["Agent", "Random", "Degree", "Centrality", "Roam", "Greedy"],
+        detection_alg=DETECTION_ALG,
+        metrics=["goal", "nmi", "steps", "time"],
+        datasets=["kar", "words", "vote", "pow"],#, "fb-75"],
+        beta=BETA,
+        tau=TAU,
+    )
+    join_images(PATH, task="node_hiding", nd_box_start_r=1.58, beta=BETA, tau=TAU)
+    
+    # COMMUNITY HIDING
     # BETA = 1
     # TAU = 0.3
-    # # NODE HIDING
     # plot_singleBeta_singleTau_allDataset(
     #     PATH,
-    #     log_name="evaluation_node_hiding",
-    #     algs=["Agent", "Random", "Degree", "Centrality", "Roam"],
+    #     log_name="evaluation_community_hiding",
+    #     algs=["Agent", "Safeness", "Modularity"],
     #     detection_alg=DETECTION_ALG,
-    #     metrics=["goal", "nmi", "steps", "time"],
+    #     metrics=["goal", "nmi", "deception_score", "steps", "time"],
     #     datasets=["kar", "words", "vote", "pow", "fb-75"],
     #     beta=BETA,
     #     tau=TAU,
     # )
-    # join_images(PATH, task="node_hiding", nd_box_start_r=1.58, beta=BETA, tau=TAU)
-    # COMMUNITY HIDING
-    BETA = 1
-    TAU = 0.3
-    plot_singleBeta_singleTau_allDataset(
-        PATH,
-        log_name="evaluation_community_hiding",
-        algs=["Agent", "Safeness", "Modularity"],
-        detection_alg=DETECTION_ALG,
-        metrics=["goal", "nmi", "deception_score", "steps", "time"],
-        datasets=["kar", "words", "vote", "pow", "fb-75"],
-        beta=BETA,
-        tau=TAU,
-    )
-    join_images(PATH, task="community_hiding", cd_box_start_r=1.63, beta=BETA, tau=TAU)
+    # join_images(PATH, task="community_hiding", cd_box_start_r=1.63, beta=BETA, tau=TAU)
