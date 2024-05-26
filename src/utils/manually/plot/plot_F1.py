@@ -89,6 +89,7 @@ def plot_singleBeta_singleTau_allDataset(
                         ]
 
                 if alg == "Agent":
+                    print(dataset)
                     metrics_dict[metric][dataset][agent_renamed] = data[alg][metric]
                 elif alg == "Centrality":
                     metrics_dict[metric][dataset][centrality_renamed] = data[alg][
@@ -269,8 +270,8 @@ def confidence_binary_test(x: List[int]):
 if __name__ == "__main__":
 
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
-    DETECTION_ALG = "louvain"
-    PATH = "test"
+    DETECTION_ALG = "walktrap"
+    PATH = "test_review"
     TYPE = 1  # 0: allBeta, 1: allDataset
     BETA = 1
     TAU = 0.5
@@ -284,7 +285,7 @@ if __name__ == "__main__":
         algs=["Agent", "Random", "Degree", "Centrality", "Roam", "Greedy"],
         detection_alg=DETECTION_ALG,
         metrics=["goal", "nmi", "steps", "time"],
-        datasets=["kar", "words", "vote", "pow"],#, "fb-75"],
+        datasets=["kar", "words", "vote", "pow", "fb-75"],
         beta=BETA,
         tau=TAU,
     )

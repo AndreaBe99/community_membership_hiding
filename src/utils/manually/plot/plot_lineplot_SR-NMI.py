@@ -201,15 +201,15 @@ def plot_singleBeta_singleTau_allDataset(
 if __name__ == "__main__":
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
     DETECTION_ALG = "greedy"
-    PATH = "test"
+    PATH = "test_review"
     TYPE = 1  # 0: allBeta, 1: allDataset
     BETA = 1
-    TAU = 0.3
+    TAU = 0.5
     # NODE HIDING
     plot_singleBeta_singleTau_allDataset(
         PATH,
         log_name="node_hiding",
-        algs=["Agent", "Random", "Degree", "Roam"],
+        algs=["Agent", "Random", "Degree", "Roam", "Greedy"],
         detection_alg=DETECTION_ALG,
         metrics=["goal", "nmi", "steps", "time"],
         datasets=["kar", "words", "vote", "pow", "fb-75"],

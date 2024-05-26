@@ -540,29 +540,25 @@ if __name__ == "__main__":
     from itertools import product
 
     ################ SINGLE DATASET - SINGLE TAU - ALL BETAS #################
-    # taus = ["0.3", "0.5", "0.8"]
-    # algs = ["greedy", "louvain", "walktrap"]
-    # datasets = ["kar", "words", "vote", "pow", "fb-75"]
+    taus = [0.5]  # ["0.3", "0.5", "0.8"]
+    algs = ["greedy", "louvain", "walktrap"]
+    datasets = ["kar", "words", "vote", "pow", "fb-75"]
 
-    # TYPE = 0  # 0: allBeta, 1: allDataset
-    # TAU = "0.5"
-    # DATASET = "pow"
-    # ALG = "greedy"
-    # PATH = f"test/{DATASET}/{ALG}/node_hiding/" + f"tau_{TAU}"
+    TYPE = 0  # 0: allBeta, 1: allDataset
 
-    # for dataset, alg, tau in product(datasets, algs, taus):
-    #     # NODE HIDING
-    #     PATH = f"test/{dataset}/{alg}/node_hiding/" + f"tau_{tau}"
-    #     plot_singleDataset_singleTaus_allBetas(
-    #         file_path=PATH,
-    #         log_name="evaluation_node_hiding",
-    #         algs=["Agent", "Random", "Degree", "Centrality", "Roam"],
-    #         metrics=["goal", "nmi", "steps", "time"],
-    #         betas=[0.5, 1, 2],
-    #         # betas=[1, 3, 5, 10],
-    #     )
+    for dataset, alg, tau in product(datasets, algs, taus):
+        # NODE HIDING
+        PATH = f"test_review/{dataset}/{alg}/node_hiding/" + f"tau_{tau}"
+        plot_singleDataset_singleTaus_allBetas(
+            file_path=PATH,
+            log_name="evaluation_node_hiding",
+            algs=["Agent", "Random", "Degree", "Centrality", "Roam", "Greedy"],
+            metrics=["goal", "nmi", "steps"],
+            betas=[0.5, 1, 2],
+            # betas=[1, 3, 5, 10],
+        )
 
-    #     join_images(PATH, task="node_hiding", nd_box_start_r=1.58)
+        join_images(PATH, task="node_hiding", nd_box_start_r=1.58)
 
     # COMMUNITY HIDING
     # PATH = f"test/{DATASET}/{ALG}/community_hiding/" + f"tau_{TAU}"
@@ -576,24 +572,24 @@ if __name__ == "__main__":
     # join_images(PATH, task="community_hiding", cd_box_start_r=1.63)
 
     ################# SINGLE BETA - SINGLE TAU - ALL DATASET #################
-    DETECTION_ALG = "louvain"
-    PATH = "test"
-    TYPE = 1  # 0: allBeta, 1: allDataset
-    BETA = 1
-    TAU = 0.5
-    # NODE HIDING
-    plot_singleBeta_singleTau_allDataset(
-        PATH,
-        log_name="evaluation_node_hiding",
-        algs=["Agent", "Random", "Degree", "Centrality", "Roam", "Greedy"],
-        detection_alg=DETECTION_ALG,
-        metrics=["goal", "nmi", "steps", "time"],
-        datasets=["kar", "words", "vote", "pow"],#, "fb-75"],
-        beta=BETA,
-        tau=TAU,
-    )
-    join_images(PATH, task="node_hiding", nd_box_start_r=1.58, beta=BETA, tau=TAU)
-    
+    # DETECTION_ALG = "greedy"
+    # PATH = "test_review"
+    # TYPE = 1  # 0: allBeta, 1: allDataset
+    # BETA = 1
+    # TAU = 0.5
+    # # NODE HIDING
+    # plot_singleBeta_singleTau_allDataset(
+    #     PATH,
+    #     log_name="evaluation_node_hiding",
+    #     algs=["Agent", "Random", "Degree", "Centrality", "Roam", "Greedy"],
+    #     detection_alg=DETECTION_ALG,
+    #     metrics=["goal", "nmi", "steps", "time"],
+    #     datasets=["kar", "words", "vote", "pow", "fb-75"],
+    #     beta=BETA,
+    #     tau=TAU,
+    # )
+    # join_images(PATH, task="node_hiding", nd_box_start_r=1.58, beta=BETA, tau=TAU)
+
     # COMMUNITY HIDING
     # BETA = 1
     # TAU = 0.3

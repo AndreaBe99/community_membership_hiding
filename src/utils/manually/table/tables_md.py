@@ -63,6 +63,7 @@ def process_json(data, tau):
         "Degree": [],
         "Centrality": [],
         "Roam": [],
+        "Greedy": [],
     }
 
     data_1 = data[metrics[0]]
@@ -84,6 +85,7 @@ def process_json(data, tau):
         "Degree": [],
         "Centrality": [],
         "Roam": [],
+        "Greedy": [],
     }
 
     data_2 = data[metrics[1]]
@@ -184,7 +186,7 @@ def save_lineplot(df_sr, df_nmi):
             plt.Line2D([], [], color=colors[2], linestyle="-"),
             plt.Line2D([], [], color=colors[3], linestyle="-"),
         ],
-        labels=["DRL-Agent (ours)", "Random", "Degree", "Centrality", "Roam"],
+        labels=["DRL-Agent (ours)", "Random", "Degree", "Centrality", "Roam", "Greedy"],
         bbox_to_anchor=(1.02, 0.9),  # Move the legend outside the plot
         borderaxespad=0,
         title="Algorithms",
@@ -202,15 +204,14 @@ def save_lineplot(df_sr, df_nmi):
 
 if __name__ == "__main__":
     # Specify the tau values
-    tau_values = [0.3, 0.5, 0.8]
-    # tau_values = [0.3]
+    tau_values = [0.5] # [0.3, 0.5, 0.8]
 
     # Load JSON data and process for each tau value
     for tau_value in tau_values:
         # Load JSON data from file
-        path = f"test/"
-        dataset = "words/"
-        algorithm = "greedy/"
+        path = f"test_review/"
+        dataset = "fb-75/"
+        algorithm = "walktrap/"
         task = "node_hiding"
         tau = f"/tau_{tau_value}/"
         json_file = f"allBetas_evaluation_{task}_mean_std.json"
