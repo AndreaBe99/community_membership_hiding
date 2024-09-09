@@ -67,39 +67,24 @@ Network architecture overview of the **Actor** and **Critic**. Initially, the no
 
 ## Requirements
 
-First of all, install the requirements:
+Make sure to have conda installed, then run:
+
+```bash
+conda conda create --name socialnets --python=3.9.18
+conda activate socialnets
+```
+
+Python 3.9 is required, as the package `karateclub` is based on old dependencies.
+
+Then, install the requirements:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Then get the version of torch and cuda:
-
-```python
-import torch
-import os
-
-os.environ["TORCH"] = torch.__version__
-
-# On Colab we can have TORCH+CUDA on os.environ["TORCH"]
-
-# Check if there is the cuda version on TORCH
-if torch.cuda.is_available():
-    print("CUDA is available")
-    print(torch.version.cuda)
-    if "+" not in os.environ["TORCH"]:
-        os.environ["TORCH"] += "+cu" + \
-            torch.version.cuda.replace(".", "")
-
-print(os.environ["TORCH"])
-```
-
-and finally install pytorch geometric:
-
 ```bash
-! pip install torch_geometric
 # Optional dependencies
-! pip install pyg_lib torch_scatter torch_sparse -f <https://data.pyg.org/whl/torch-${TORCH}.html>
+pip install pyg_lib torch_scatter torch_sparse -f <https://data.pyg.org/whl/torch-${TORCH}.html>
 ```
 
 
